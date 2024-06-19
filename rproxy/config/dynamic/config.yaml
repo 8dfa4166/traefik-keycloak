@@ -10,15 +10,24 @@ tls:
           - /etc/traefik/certs/client/inCA2.pem
         clientAuthType: RequireAndVerifyClientCert
 http:
+  serversTransports:
+    mytransport:
+      insecureSkipVerify: true
+  middlewares:
+    test-passtlsclientcert:
+      passTLSClientCert:
+        pem: true
   routers:
     traefik:
       rule: "Host(`traefik.aimerzarashi.com`)"
       service: api@internal
+      # tls: {}
       tls:
         options: client-auth@file
     whoami:
       rule: "Host(`whoami.aimerzarashi.com`)"
       service: whoami
+      # tls: {}
       tls:
         options: client-auth@file
     web:
@@ -26,9 +35,12 @@ http:
       service: web
       tls: {}
     idp:
+      entryPoints:
+        - "websecure"
       rule: "Host(`idp.aimerzarashi.com`)"
       service: idp
       tls: {}
+      # middlewares: test-passtlsclientcert
     smtp:
       rule: "Host(`smtp.aimerzarashi.com`)"
       service: smtp
@@ -42,10 +54,13 @@ http:
       loadBalancer:
         servers:
           - url: http://web:3000
+        sticky:
+          cookie: {}
     idp:
       loadBalancer:
+        serversTransport: mytransport
         servers:
-          - url: http://idp:8080
+          - url: https://idp:8443
     smtp:
       loadBalancer:
         servers:

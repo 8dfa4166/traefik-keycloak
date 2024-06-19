@@ -21,6 +21,8 @@ services:
   whoami:
     image: traefik/whoami
   web:
+    deploy:
+      replicas: 2
     image: node:20-alpine3.18
     depends_on:
       - idp
@@ -35,32 +37,32 @@ services:
         npm install;
         npm run dev;
   idp:
-    ports:
-      - 8080:8080
-      - 8443:8443
-    image: bitnami/keycloak:24
+    image: keycloak/keycloak:25.0
     environment:
-      KEYCLOAK_ADMIN_USER: user
+      # KC_LOG_LEVEL: info,org.keycloak.authentication:trace
+      KEYCLOAK_ADMIN: user
       KEYCLOAK_ADMIN_PASSWORD: bitnami
-      KEYCLOAK_DATABASE_HOST: db
-      KEYCLOAK_DATABASE_PORT: 5432
-      KEYCLOAK_DATABASE_NAME: bitnami_keycloak
-      KEYCLOAK_DATABASE_USER: bn_keycloak
-      KEYCLOAK_DATABASE_PASSWORD: password
-      KC_HOSTNAME_URL: "https://idp.aimerzarashi.com"
-      KC_HOSTNAME_ADMIN_URL: "https://idp.aimerzarashi.com"
-      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
-      KEYCLOAK_PRODUCTION: true
-      KEYCLOAK_ENABLE_HTTPS: true
-      KEYCLOAK_HTTPS_USE_PEM: true
-      KEYCLOAK_HTTPS_CERTIFICATE_FILE: /opt/bitnami/keycloak/certs/server.pem
-      KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE: /opt/bitnami/keycloak/certs/server.key
-      # KEYCLOAK_LOG_LEVEL: debug
+      KC_DB: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_HOST: db
+      KC_DB_URL_DATABASE: bitnami_keycloak
+      KC_DB_PASSWORD: password
+      KC_DB_USERNAME: bn_keycloak
+      KC_HOSTNAME: idp.aimerzarashi.com
+      KC_HTTP_ENABLED: false
+      KC_HOSTNAME_STRICT: false
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTPS_CLIENT_AUTH: request
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/server.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/server.key
+    command:
+      - "start"
+    volumes:
+      - ./idp/certs:/opt/keycloak/conf/certs
+      - ./idp/truststores:/opt/keycloak/conf/truststores
     depends_on:
       - db
       - smtp
-    volumes:
-      - ./idp/certs:/opt/bitnami/keycloak/certs
   db:
     container_name: db
     image: postgres:16.3
@@ -72,5 +74,4 @@ services:
     volumes:
       - ./db/data:/var/lib/postgresql/data
   smtp:
-    container_name: smtp
     image: mailhog/mailhog
