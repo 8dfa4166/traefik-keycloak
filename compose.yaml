@@ -37,6 +37,8 @@ services:
         npm install;
         npm run dev;
   idp:
+    deploy:
+      replicas: 2
     image: keycloak/keycloak:24.0
     environment:
       # KC_LOG_LEVEL: info,org.keycloak.authentication:trace
@@ -75,3 +77,11 @@ services:
       - ./db/data:/var/lib/postgresql/data
   smtp:
     image: mailhog/mailhog
+  prometheus:
+    image: prom/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prom/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  grafana:
+    image: grafana/grafana

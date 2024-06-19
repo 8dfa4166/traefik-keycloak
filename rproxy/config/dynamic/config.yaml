@@ -13,6 +13,14 @@ http:
   serversTransports:
     mytransport:
       insecureSkipVerify: true
+      # certificates:
+      #   - certFile: /etc/traefik/certs/server/server.pem
+      #     keyFile: /etc/traefik/certs/server/server.key
+      # rootCAs:
+      #   - /etc/traefik/certs/server/rootCA1.pem
+      #   - /etc/traefik/certs/server/inCA1.pem
+      #   - /etc/traefik/certs/client/rootCA2.pem
+      #   - /etc/traefik/certs/client/inCA2.pem
   middlewares:
     test-passtlsclientcert:
       passTLSClientCert:
@@ -27,9 +35,9 @@ http:
     whoami:
       rule: "Host(`whoami.aimerzarashi.com`)"
       service: whoami
-      # tls: {}
-      tls:
-        options: client-auth@file
+      tls: {}
+      # tls:
+      #   options: client-auth@file
     web:
       rule: "Host(`web.aimerzarashi.com`)"
       service: web
@@ -40,10 +48,20 @@ http:
       rule: "Host(`idp.aimerzarashi.com`)"
       service: idp
       tls: {}
+      # tls:
+      #   options: client-auth@file
       # middlewares: test-passtlsclientcert
     smtp:
       rule: "Host(`smtp.aimerzarashi.com`)"
       service: smtp
+      tls: {}
+    prometheus:
+      rule: "Host(`prometheus.aimerzarashi.com`)"
+      service: prometheus
+      tls: {}
+    grafana:
+      rule: "Host(`grafana.aimerzarashi.com`)"
+      service: grafana
       tls: {}
   services:
     whoami:
@@ -52,12 +70,14 @@ http:
           - url: http://whoami:80
     web:
       loadBalancer:
-        servers:
-          - url: http://web:3000
         sticky:
           cookie: {}
+        servers:
+          - url: http://web:3000
     idp:
       loadBalancer:
+        sticky:
+          cookie: {}
         serversTransport: mytransport
         servers:
           - url: https://idp:8443
@@ -65,3 +85,11 @@ http:
       loadBalancer:
         servers:
           - url: http://smtp:8025
+    prometheus:
+      loadBalancer:
+        servers:
+          - url: http://prometheus:9090
+    grafana:
+      loadBalancer:
+        servers:
+          - url: http://grafana:3000
