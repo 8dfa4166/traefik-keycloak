@@ -1,8 +1,6 @@
-global:
-  scrape_interval: 1s
-
 scrape_configs:
-  - job_name: prometheus
+  - job_name: "otelcol"
+    scrape_interval: 10s
     static_configs:
-      - targets:
-          - "web:3000"
+      - targets: ["otelcol:8889"]
+      - targets: ["otelcol:8888"]

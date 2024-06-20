@@ -33,3 +33,13 @@ accessLog:
         User-Agent: redact
         Authorization: drop
         Content-Type: keep
+
+metrics:
+  otlp:
+    http:
+      endpoint: http://otelcol:4318/v1/metrics
+
+tracing:
+  otlp:
+    http:
+      endpoint: http://otelcol:4318/v1/traces

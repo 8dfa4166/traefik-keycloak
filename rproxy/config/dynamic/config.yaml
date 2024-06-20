@@ -55,14 +55,18 @@ http:
       rule: "Host(`smtp.aimerzarashi.com`)"
       service: smtp
       tls: {}
-    prometheus:
-      rule: "Host(`prometheus.aimerzarashi.com`)"
-      service: prometheus
-      tls: {}
-    grafana:
-      rule: "Host(`grafana.aimerzarashi.com`)"
-      service: grafana
-      tls: {}
+    # prometheus:
+    #   rule: "Host(`prometheus.aimerzarashi.com`)"
+    #   service: prometheus
+    #   tls: {}
+    # grafana:
+    #   rule: "Host(`grafana.aimerzarashi.com`)"
+    #   service: grafana
+    #   tls: {}
+    # jaeger:
+    #   rule: "Host(`jaeger.aimerzarashi.com`)"
+    #   service: jaeger
+    #   tls: {}
   services:
     whoami:
       loadBalancer:
@@ -85,11 +89,15 @@ http:
       loadBalancer:
         servers:
           - url: http://smtp:8025
-    prometheus:
-      loadBalancer:
-        servers:
-          - url: http://prometheus:9090
-    grafana:
-      loadBalancer:
-        servers:
-          - url: http://grafana:3000
+    # prometheus:
+    #   loadBalancer:
+    #     servers:
+    #       - url: http://prometheus:9090
+    # grafana:
+    #   loadBalancer:
+    #     servers:
+    #       - url: http://grafana:3000
+    # jaeger:
+    #   loadBalancer:
+    #     servers:
+    #       - url: http://jaeger:4318
